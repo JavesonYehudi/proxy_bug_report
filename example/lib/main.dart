@@ -29,7 +29,7 @@ class _MyAppState extends State<MyApp> {
     });
 
     try {
-      final credentials = await _proxyBugReportPlugin.getPlatformVersion();
+      final credentials = await _proxyBugReportPlugin.getCredentials();
       setState(() {
         _accessToken = credentials.accessToken;
         _isLoading = false;

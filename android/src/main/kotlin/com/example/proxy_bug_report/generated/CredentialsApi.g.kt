@@ -6,20 +6,16 @@
 import android.util.Log
 import io.flutter.plugin.common.BasicMessageChannel
 import io.flutter.plugin.common.BinaryMessenger
+import io.flutter.plugin.common.EventChannel
 import io.flutter.plugin.common.MessageCodec
+import io.flutter.plugin.common.StandardMethodCodec
 import io.flutter.plugin.common.StandardMessageCodec
 import java.io.ByteArrayOutputStream
 import java.nio.ByteBuffer
-
 private object CredentialsApiPigeonUtils {
 
   fun createConnectionError(channelName: String): FlutterError {
-    return FlutterError(
-      "channel-error",
-      "Unable to establish connection on channel: '$channelName'.",
-      ""
-    )
-  }
+    return FlutterError("channel-error",  "Unable to establish connection on channel: '$channelName'.", "")  }
 
   fun wrapResult(result: Any?): List<Any?> {
     return listOf(result)
@@ -48,12 +44,11 @@ private object CredentialsApiPigeonUtils {
  * @property message The error message.
  * @property details The error details. Must be a datatype supported by the api codec.
  */
-class FlutterError(
+class FlutterError (
   val code: String,
   override val message: String? = null,
   val details: Any? = null
 ) : Throwable()
-
 /**
  * Maintains instances used to communicate with the corresponding objects in Dart.
  *
@@ -234,9 +229,7 @@ class CredentialsApiPigeonInstanceManager(private val finalizationListener: Pige
       return
     }
     var reference: java.lang.ref.WeakReference<Any>?
-    while ((referenceQueue.poll() as java.lang.ref.WeakReference<Any>?).also {
-        reference = it
-      } != null) {
+    while ((referenceQueue.poll() as java.lang.ref.WeakReference<Any>?).also { reference = it } != null) {
       val identifier = weakReferencesToIdentifiers.remove(reference)
       if (identifier != null) {
         weakInstances.remove(identifier)
@@ -282,16 +275,9 @@ private class CredentialsApiPigeonInstanceManagerApi(val binaryMessenger: Binary
      * Sets up an instance of `CredentialsApiPigeonInstanceManagerApi` to handle messages from the
      * `binaryMessenger`.
      */
-    fun setUpMessageHandlers(
-      binaryMessenger: BinaryMessenger,
-      instanceManager: CredentialsApiPigeonInstanceManager?
-    ) {
+    fun setUpMessageHandlers(binaryMessenger: BinaryMessenger, instanceManager: CredentialsApiPigeonInstanceManager?) {
       run {
-        val channel = BasicMessageChannel<Any?>(
-          binaryMessenger,
-          "dev.flutter.pigeon.com.example.proxy_bug_report.PigeonInternalInstanceManager.removeStrongReference",
-          codec
-        )
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.com.example.proxy_bug_report.PigeonInternalInstanceManager.removeStrongReference", codec)
         if (instanceManager != null) {
           channel.setMessageHandler { message, reply ->
             val args = message as List<Any?>
@@ -309,11 +295,7 @@ private class CredentialsApiPigeonInstanceManagerApi(val binaryMessenger: Binary
         }
       }
       run {
-        val channel = BasicMessageChannel<Any?>(
-          binaryMessenger,
-          "dev.flutter.pigeon.com.example.proxy_bug_report.PigeonInternalInstanceManager.clear",
-          codec
-        )
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.com.example.proxy_bug_report.PigeonInternalInstanceManager.clear", codec)
         if (instanceManager != null) {
           channel.setMessageHandler { _, reply ->
             val wrapped: List<Any?> = try {
@@ -331,9 +313,9 @@ private class CredentialsApiPigeonInstanceManagerApi(val binaryMessenger: Binary
     }
   }
 
-  fun removeStrongReference(identifierArg: Long, callback: (Result<Unit>) -> Unit) {
-    val channelName =
-      "dev.flutter.pigeon.com.example.proxy_bug_report.PigeonInternalInstanceManager.removeStrongReference"
+  fun removeStrongReference(identifierArg: Long, callback: (Result<Unit>) -> Unit)
+{
+    val channelName = "dev.flutter.pigeon.com.example.proxy_bug_report.PigeonInternalInstanceManager.removeStrongReference"
     val channel = BasicMessageChannel<Any?>(binaryMessenger, channelName, codec)
     channel.send(listOf(identifierArg)) {
       if (it is List<*>) {
@@ -344,11 +326,10 @@ private class CredentialsApiPigeonInstanceManagerApi(val binaryMessenger: Binary
         }
       } else {
         callback(Result.failure(CredentialsApiPigeonUtils.createConnectionError(channelName)))
-      }
+      } 
     }
   }
 }
-
 /**
  * Provides implementations for each ProxyApi implementation and provides access to resources
  * needed by any implementation.
@@ -383,7 +364,6 @@ abstract class CredentialsApiPigeonProxyApiRegistrar(val binaryMessenger: Binary
       }
     )
   }
-
   /**
    * An implementation of [PigeonApiAuth] used to add a new Dart instance of
    * `Auth` to the Dart `InstanceManager`.
@@ -400,15 +380,12 @@ abstract class CredentialsApiPigeonProxyApiRegistrar(val binaryMessenger: Binary
     CredentialsApiPigeonInstanceManagerApi.setUpMessageHandlers(binaryMessenger, instanceManager)
     PigeonApiAuth.setUpMessageHandlers(binaryMessenger, getPigeonApiAuth())
   }
-
   fun tearDown() {
     CredentialsApiPigeonInstanceManagerApi.setUpMessageHandlers(binaryMessenger, null)
     PigeonApiAuth.setUpMessageHandlers(binaryMessenger, null)
   }
 }
-
-private class CredentialsApiPigeonProxyApiBaseCodec(val registrar: CredentialsApiPigeonProxyApiRegistrar) :
-  CredentialsApiPigeonCodec() {
+private class CredentialsApiPigeonProxyApiBaseCodec(val registrar: CredentialsApiPigeonProxyApiRegistrar) : CredentialsApiPigeonCodec() {
   override fun readValueOfType(type: Byte, buffer: ByteBuffer): Any? {
     return when (type) {
       128.toByte() -> {
@@ -422,7 +399,6 @@ private class CredentialsApiPigeonProxyApiBaseCodec(val registrar: CredentialsAp
         }
         return instance
       }
-
       else -> super.readValueOfType(type, buffer)
     }
   }
@@ -433,12 +409,11 @@ private class CredentialsApiPigeonProxyApiBaseCodec(val registrar: CredentialsAp
       return
     }
 
-    if (value is com.example.proxy_bug_report.Auth) {
+    if (value is com.example.proxy_bug_report.auth.Auth) {
       registrar.getPigeonApiAuth().pigeon_newInstance(value) { }
-    } else if (value is com.example.proxy_bug_report.Credentials) {
-      android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({
-        registrar.getPigeonApiCredentials().pigeon_newInstance(value) { }
-      }, 1)
+    }
+     else if (value is com.example.proxy_bug_report.auth.Credentials) {
+      registrar.getPigeonApiCredentials().pigeon_newInstance(value) { }
     }
 
     when {
@@ -446,50 +421,37 @@ private class CredentialsApiPigeonProxyApiBaseCodec(val registrar: CredentialsAp
         stream.write(128)
         writeValue(stream, registrar.instanceManager.getIdentifierForStrongReference(value))
       }
-
       else -> throw IllegalArgumentException("Unsupported value: '$value' of type '${value.javaClass.name}'")
     }
   }
 }
-
 private open class CredentialsApiPigeonCodec : StandardMessageCodec() {
   override fun readValueOfType(type: Byte, buffer: ByteBuffer): Any? {
-    return super.readValueOfType(type, buffer)
+    return     super.readValueOfType(type, buffer)
   }
-
-  override fun writeValue(stream: ByteArrayOutputStream, value: Any?) {
+  override fun writeValue(stream: ByteArrayOutputStream, value: Any?)   {
     super.writeValue(stream, value)
   }
 }
 
 @Suppress("UNCHECKED_CAST")
 abstract class PigeonApiAuth(open val pigeonRegistrar: CredentialsApiPigeonProxyApiRegistrar) {
-  abstract fun pigeon_defaultConstructor(): com.example.proxy_bug_report.Auth
+  abstract fun pigeon_defaultConstructor(): com.example.proxy_bug_report.auth.Auth
 
-  abstract fun login(
-    pigeon_instance: com.example.proxy_bug_report.Auth,
-    callback: (Result<com.example.proxy_bug_report.Credentials>) -> Unit
-  )
+  abstract fun getCredentials(pigeon_instance: com.example.proxy_bug_report.auth.Auth, callback: (Result<com.example.proxy_bug_report.auth.Credentials>) -> Unit)
 
   companion object {
     @Suppress("LocalVariableName")
     fun setUpMessageHandlers(binaryMessenger: BinaryMessenger, api: PigeonApiAuth?) {
       val codec = api?.pigeonRegistrar?.codec ?: CredentialsApiPigeonCodec()
       run {
-        val channel = BasicMessageChannel<Any?>(
-          binaryMessenger,
-          "dev.flutter.pigeon.com.example.proxy_bug_report.Auth.pigeon_defaultConstructor",
-          codec
-        )
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.com.example.proxy_bug_report.Auth.pigeon_defaultConstructor", codec)
         if (api != null) {
           channel.setMessageHandler { message, reply ->
             val args = message as List<Any?>
             val pigeon_identifierArg = args[0] as Long
             val wrapped: List<Any?> = try {
-              api.pigeonRegistrar.instanceManager.addDartCreatedInstance(
-                api.pigeon_defaultConstructor(),
-                pigeon_identifierArg
-              )
+              api.pigeonRegistrar.instanceManager.addDartCreatedInstance(api.pigeon_defaultConstructor(), pigeon_identifierArg)
               listOf(null)
             } catch (exception: Throwable) {
               CredentialsApiPigeonUtils.wrapError(exception)
@@ -501,16 +463,12 @@ abstract class PigeonApiAuth(open val pigeonRegistrar: CredentialsApiPigeonProxy
         }
       }
       run {
-        val channel = BasicMessageChannel<Any?>(
-          binaryMessenger,
-          "dev.flutter.pigeon.com.example.proxy_bug_report.Auth.login",
-          codec
-        )
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.com.example.proxy_bug_report.Auth.getCredentials", codec)
         if (api != null) {
           channel.setMessageHandler { message, reply ->
             val args = message as List<Any?>
-            val pigeon_instanceArg = args[0] as com.example.proxy_bug_report.Auth
-            api.login(pigeon_instanceArg) { result: Result<com.example.proxy_bug_report.Credentials> ->
+            val pigeon_instanceArg = args[0] as com.example.proxy_bug_report.auth.Auth
+            api.getCredentials(pigeon_instanceArg) { result: Result<com.example.proxy_bug_report.auth.Credentials> ->
               val error = result.exceptionOrNull()
               if (error != null) {
                 reply.reply(CredentialsApiPigeonUtils.wrapError(error))
@@ -528,22 +486,17 @@ abstract class PigeonApiAuth(open val pigeonRegistrar: CredentialsApiPigeonProxy
   }
 
   @Suppress("LocalVariableName", "FunctionName")
-      /** Creates a Dart instance of Auth and attaches it to [pigeon_instanceArg]. */
-  fun pigeon_newInstance(
-    pigeon_instanceArg: com.example.proxy_bug_report.Auth,
-    callback: (Result<Unit>) -> Unit
-  ) {
+  /** Creates a Dart instance of Auth and attaches it to [pigeon_instanceArg]. */
+  fun pigeon_newInstance(pigeon_instanceArg: com.example.proxy_bug_report.auth.Auth, callback: (Result<Unit>) -> Unit)
+{
     if (pigeonRegistrar.ignoreCallsToDart) {
       callback(
-        Result.failure(
-          FlutterError("ignore-calls-error", "Calls to Dart are being ignored.", "")
-        )
-      )
-    } else if (pigeonRegistrar.instanceManager.containsInstance(pigeon_instanceArg)) {
+          Result.failure(
+              FlutterError("ignore-calls-error", "Calls to Dart are being ignored.", "")))
+    }     else if (pigeonRegistrar.instanceManager.containsInstance(pigeon_instanceArg)) {
       callback(Result.success(Unit))
-    } else {
-      val pigeon_identifierArg =
-        pigeonRegistrar.instanceManager.addHostCreatedInstance(pigeon_instanceArg)
+    }     else {
+      val pigeon_identifierArg = pigeonRegistrar.instanceManager.addHostCreatedInstance(pigeon_instanceArg)
       val binaryMessenger = pigeonRegistrar.binaryMessenger
       val codec = pigeonRegistrar.codec
       val channelName = "dev.flutter.pigeon.com.example.proxy_bug_report.Auth.pigeon_newInstance"
@@ -551,72 +504,49 @@ abstract class PigeonApiAuth(open val pigeonRegistrar: CredentialsApiPigeonProxy
       channel.send(listOf(pigeon_identifierArg)) {
         if (it is List<*>) {
           if (it.size > 1) {
-            callback(
-              Result.failure(
-                FlutterError(
-                  it[0] as String,
-                  it[1] as String,
-                  it[2] as String?
-                )
-              )
-            )
+            callback(Result.failure(FlutterError(it[0] as String, it[1] as String, it[2] as String?)))
           } else {
             callback(Result.success(Unit))
           }
         } else {
           callback(Result.failure(CredentialsApiPigeonUtils.createConnectionError(channelName)))
-        }
+        } 
       }
     }
   }
 
 }
-
 @Suppress("UNCHECKED_CAST")
 abstract class PigeonApiCredentials(open val pigeonRegistrar: CredentialsApiPigeonProxyApiRegistrar) {
-  abstract fun accessToken(pigeon_instance: com.example.proxy_bug_report.Credentials): String
+  abstract fun accessToken(pigeon_instance: com.example.proxy_bug_report.auth.Credentials): String
 
   @Suppress("LocalVariableName", "FunctionName")
-      /** Creates a Dart instance of Credentials and attaches it to [pigeon_instanceArg]. */
-  fun pigeon_newInstance(
-    pigeon_instanceArg: com.example.proxy_bug_report.Credentials,
-    callback: (Result<Unit>) -> Unit
-  ) {
+  /** Creates a Dart instance of Credentials and attaches it to [pigeon_instanceArg]. */
+  fun pigeon_newInstance(pigeon_instanceArg: com.example.proxy_bug_report.auth.Credentials, callback: (Result<Unit>) -> Unit)
+{
     if (pigeonRegistrar.ignoreCallsToDart) {
       callback(
-        Result.failure(
-          FlutterError("ignore-calls-error", "Calls to Dart are being ignored.", "")
-        )
-      )
-    } else if (pigeonRegistrar.instanceManager.containsInstance(pigeon_instanceArg)) {
+          Result.failure(
+              FlutterError("ignore-calls-error", "Calls to Dart are being ignored.", "")))
+    }     else if (pigeonRegistrar.instanceManager.containsInstance(pigeon_instanceArg)) {
       callback(Result.success(Unit))
-    } else {
-      val pigeon_identifierArg =
-        pigeonRegistrar.instanceManager.addHostCreatedInstance(pigeon_instanceArg)
+    }     else {
+      val pigeon_identifierArg = pigeonRegistrar.instanceManager.addHostCreatedInstance(pigeon_instanceArg)
       val accessTokenArg = accessToken(pigeon_instanceArg)
       val binaryMessenger = pigeonRegistrar.binaryMessenger
       val codec = pigeonRegistrar.codec
-      val channelName =
-        "dev.flutter.pigeon.com.example.proxy_bug_report.Credentials.pigeon_newInstance"
+      val channelName = "dev.flutter.pigeon.com.example.proxy_bug_report.Credentials.pigeon_newInstance"
       val channel = BasicMessageChannel<Any?>(binaryMessenger, channelName, codec)
       channel.send(listOf(pigeon_identifierArg, accessTokenArg)) {
         if (it is List<*>) {
           if (it.size > 1) {
-            callback(
-              Result.failure(
-                FlutterError(
-                  it[0] as String,
-                  it[1] as String,
-                  it[2] as String?
-                )
-              )
-            )
+            callback(Result.failure(FlutterError(it[0] as String, it[1] as String, it[2] as String?)))
           } else {
             callback(Result.success(Unit))
           }
         } else {
           callback(Result.failure(CredentialsApiPigeonUtils.createConnectionError(channelName)))
-        }
+        } 
       }
     }
   }

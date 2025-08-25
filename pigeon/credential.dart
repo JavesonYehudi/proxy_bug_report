@@ -10,19 +10,19 @@ import 'package:pigeon/pigeon.dart';
 )
 @ProxyApi(
   kotlinOptions: KotlinProxyApiOptions(
-    fullClassName: 'com.example.proxy_bug_report.Auth',
+    fullClassName: 'com.example.proxy_bug_report.auth.Auth',
   ),
 )
 abstract class Auth {
   Auth();
 
   @async
-  Credentials login();
+  Credentials getCredentials();
 }
 
 @ProxyApi(
   kotlinOptions: KotlinProxyApiOptions(
-    fullClassName: 'com.example.proxy_bug_report.Credentials',
+    fullClassName: 'com.example.proxy_bug_report.auth.Credentials',
   ),
 )
 abstract class Credentials {

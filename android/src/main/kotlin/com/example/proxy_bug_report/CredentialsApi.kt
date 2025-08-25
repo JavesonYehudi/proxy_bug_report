@@ -2,6 +2,7 @@ package com.example.proxy_bug_report
 
 import CredentialsApiPigeonProxyApiRegistrar
 import PigeonApiCredentials
+import com.example.proxy_bug_report.auth.Credentials
 
 class CredentialsApi(pigeonRegistrar: CredentialsApiPigeonProxyApiRegistrar) :
   PigeonApiCredentials(pigeonRegistrar) {

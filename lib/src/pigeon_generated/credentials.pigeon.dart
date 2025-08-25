@@ -546,12 +546,12 @@ class Auth extends PigeonInternalProxyApiBaseClass {
     }
   }
 
-  Future<Credentials> login() async {
+  Future<Credentials> getCredentials() async {
     final _PigeonInternalProxyApiBaseCodec pigeonChannelCodec =
         _pigeonVar_codecAuth;
     final BinaryMessenger? pigeonVar_binaryMessenger = pigeon_binaryMessenger;
     const String pigeonVar_channelName =
-        'dev.flutter.pigeon.com.example.proxy_bug_report.Auth.login';
+        'dev.flutter.pigeon.com.example.proxy_bug_report.Auth.getCredentials';
     final BasicMessageChannel<Object?> pigeonVar_channel =
         BasicMessageChannel<Object?>(
       pigeonVar_channelName,
